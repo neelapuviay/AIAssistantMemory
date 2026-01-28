@@ -10,11 +10,13 @@ export const searchMemory = tool({
   }),
   execute: async ({ query }) => {
     try {
+      console.log(`[DEBUG] Searching memory for query: "${query}" (userId: ${DEFAULT_USER_ID})`);
       const memory = getMemoryInstance();
       const results = await memory.search(query, {
         userId: DEFAULT_USER_ID,
         limit: 5,
       });
+      console.log(`[DEBUG] Search results: ${results.results?.length || 0} memories found`);
 
       return {
         success: true,
@@ -45,9 +47,11 @@ export const createMemory = tool({
   }),
   execute: async ({ content }) => {
     try {
+      console.log("Saving memory with content:", content);
       const memory = getMemoryInstance();
       const messages = [{ role: "user" as const, content }];
       const result = await memory.add(messages, { userId: DEFAULT_USER_ID });
+      console.log("Memory save result:", JSON.stringify(result, null, 2));
 
       return {
         success: true,

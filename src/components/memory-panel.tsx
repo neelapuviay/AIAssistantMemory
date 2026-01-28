@@ -65,6 +65,29 @@ export function MemoryPanel() {
     }
   };
 
+  const deleteAllMemories = async () => {
+    if (!confirm("Are you sure you want to delete ALL memories? This cannot be undone.")) {
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const res = await fetch("/api/memories", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ deleteAll: true }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setMemories([]);
+      }
+    } catch (error) {
+      console.error("Failed to delete all memories:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <Card className="h-[600px] flex flex-col border-0 shadow-xl bg-white/80 backdrop-blur-sm">
       <CardHeader className="pb-3 bg-gradient-to-r from-emerald-50 to-teal-50 border-b">
@@ -82,20 +105,34 @@ export function MemoryPanel() {
               </p>
             </div>
           </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={fetchMemories}
-            disabled={loading}
-            className="h-8 gap-1.5"
-          >
-            {loading ? (
-              <Loader2 className="h-3.5 w-3.5 animate-spin" />
-            ) : (
-              <RefreshCw className="h-3.5 w-3.5" />
+          <div className="flex items-center gap-2">
+            {memories.length > 0 && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={deleteAllMemories}
+                disabled={loading}
+                className="h-8 gap-1.5 text-red-500 border-red-100 hover:bg-red-50 hover:text-red-600 hover:border-red-200"
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+                Clear All
+              </Button>
             )}
-            Refresh
-          </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={fetchMemories}
+              disabled={loading}
+              className="h-8 gap-1.5"
+            >
+              {loading ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <RefreshCw className="h-3.5 w-3.5" />
+              )}
+              Refresh
+            </Button>
+          </div>
         </div>
       </CardHeader>
 

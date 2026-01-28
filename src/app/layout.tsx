@@ -14,7 +14,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-purple-50">
+      <body
+        className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-purple-50"
+        suppressHydrationWarning
+      >
         {children}
       </body>
     </html>

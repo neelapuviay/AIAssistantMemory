@@ -25,8 +25,30 @@ export async function GET() {
 
 export async function DELETE(req: Request) {
   try {
-    const { memoryId } = await req.json();
+    const { memoryId, deleteAll } = await req.json();
     const memory = getMemoryInstance();
+
+    if (deleteAll) {
+      // mem0ai supports deleteAll for vector store
+      await memory.deleteAll({ userId: DEFAULT_USER_ID });
+
+      // If graph is enabled, clear it too
+      const memAny = memory as any;
+      if (memAny.graphMemory && typeof memAny.graphMemory.deleteAll === 'function') {
+        try {
+          await memAny.graphMemory.deleteAll({ userId: DEFAULT_USER_ID });
+        } catch (graphError) {
+          console.error("Failed to delete graph memories:", graphError);
+          // We continue because vector memories were already deleted
+        }
+      }
+
+      return NextResponse.json({
+        success: true,
+        message: "All memories deleted successfully (including graph)",
+      });
+    }
+
     await memory.delete(memoryId);
 
     return NextResponse.json({
